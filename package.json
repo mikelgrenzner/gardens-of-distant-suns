@@ -1,0 +1,10 @@
+{
+  "name": "gardens-of-distant-suns",
+  "private": true,
+  "type": "module",
+  "description": "A solarpunk idle game of zellige gardens and wormhole-linked suns",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8000"
+  }
+}
