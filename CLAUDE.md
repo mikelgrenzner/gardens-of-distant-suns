@@ -6,6 +6,10 @@ A web-based solarpunk idle game. Systems are 8-point zellige stars that develop 
 
 The design document is not in this repo. It is `claude/HANDOFF.md` in the claude.ai project "Gardens Of Distant Suns Idle". Read it before changing game rules. Its tags say what is safe to change: **[Decided]** needs Mikel's approval, **[Assumed]** is cheap to change, **[Open]** has a recommended default. When a rule changes here, update the handoff to match.
 
+## Never edit Undertone
+
+Undertone (mikelgrenzner/undertone, Mikel's pomodoro timer at mikelgrenzner.github.io/undertone) is the visual style reference for this game. Work on this game may read it but must never edit, commit to, or push to it. Don't request push access to it from here. Copy anything borrowed into this repo instead. This rule applies to work on this game only; it does not restrict work done for Undertone itself.
+
 ## Conventions
 
 - Plain JavaScript ES modules. No build step and no dependencies. The game must run by serving the repo root as static files (GitHub Pages works).
