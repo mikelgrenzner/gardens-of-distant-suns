@@ -1,15 +1,21 @@
-// Player actions for Milestone 0. These are the next thing to build.
-// Each takes the state, changes it, and returns { ok, reason? }.
+// Player actions. Each takes the state, changes it, and returns { ok, reason? }.
+import { CONFIG } from './config.js';
+import { buildGarden, frontier } from './garden.js';
+import { STOCKS, awakeIds, light, wakeCost } from './sim.js';
 
-// Choose which candidate hue a latent system collapses toward.
-// TODO(M0): validate hue is in system.candidates, set system.chosenHue,
-// and decide whether this immediately recolors tiles or only steers cultivation.
-export function chooseHue(state, systemId, hue) {
-  return { ok: false, reason: 'not built yet' };
-}
-
-// Spend stock to cultivate one tile: raise its saturation and value toward the chosen hue.
-// TODO(M0): cost curve and step sizes go in CONFIG. Requires chosenHue to be set.
-export function cultivate(state, systemId, tileId) {
-  return { ok: false, reason: 'not built yet' };
+// Wake a sleeping sun that touches an awake one. The cost is taken from the three
+// stocks in proportion to what's held.
+export function wake(state, tileId, cfg = CONFIG) {
+  const garden = buildGarden(state.pattern);
+  const ids = awakeIds(state);
+  const tile = garden.byId.get(tileId);
+  if (!tile || tile.kind !== 'sun') return { ok: false, reason: 'not a sun' };
+  if (ids.includes(tileId)) return { ok: false, reason: 'already awake' };
+  if (!frontier(garden, new Set(ids)).has(tileId)) return { ok: false, reason: 'not next to an awake sun' };
+  const cost = wakeCost(state, cfg);
+  const have = light(state);
+  if (have < cost) return { ok: false, reason: 'not enough light', short: cost - have };
+  for (const k of STOCKS) state.stocks[k] -= (state.stocks[k] / have) * cost;
+  ids.push(tileId);
+  return { ok: true };
 }

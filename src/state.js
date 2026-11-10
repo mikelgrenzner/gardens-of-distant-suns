@@ -1,39 +1,18 @@
 // Game state, new games, and saving. State holds only what can't be derived:
-// tile colors, stocks, timestamps. Geometry and tiers are recomputed.
+// which suns are awake in each pattern, the stocks, the chosen pattern, palette
+// and style, and a timestamp. Geometry and colors are recomputed.
 import { CONFIG } from './config.js';
-import { starTiles } from './geometry.js';
-import { PRIMARY_ANGLES, hsvToRgb } from './color.js';
 
-export const STATE_VERSION = 1;
+export const STATE_VERSION = 2;
 
-function latentTiles(i, j, [hA, hB], cfg) {
-  return starTiles(i, j).map((t, n) => {
-    // Core shows the first candidate faintly; points alternate between both candidates.
-    const hue = t.shape === 'core' || n % 2 === 1 ? hA : hB;
-    const s = t.shape === 'core' ? cfg.LATENT_SATURATION / 2 : cfg.LATENT_SATURATION;
-    return { id: t.id, shape: t.shape, rgb: hsvToRgb(hue, s, cfg.LATENT_VALUE) };
-  });
-}
-
-export function newGame({ now = Date.now(), rand = Math.random, cfg = CONFIG } = {}) {
-  // Primaries are found, secondaries are made: a fresh system's candidates are two primaries.
-  const first = Math.floor(rand() * 3);
-  const second = (first + 1 + Math.floor(rand() * 2)) % 3;
-  const candidates = [PRIMARY_ANGLES[first], PRIMARY_ANGLES[second]];
+export function newGame({ now = Date.now(), cfg = CONFIG } = {}) {
   return {
     version: STATE_VERSION,
+    pattern: cfg.START_PATTERN,
+    palette: cfg.START_PALETTE,
+    scheme: cfg.START_SCHEME,
     stocks: { energy: 0, life: 0, information: 0 },
-    systems: [{
-      id: 'origin',
-      body: 'planetary',
-      i: 0,
-      j: 0,
-      candidates,
-      chosenHue: null,
-      tiles: latentTiles(0, 0, candidates, cfg),
-    }],
-    gates: [],
-    bitDepth: cfg.START_BIT_DEPTH,
+    awake: {},                     // pattern key -> ids of awake suns; filled in on first use
     lastSeen: now,
   };
 }
